@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WaitLift</title>
+</head>
+<body>
+  <h1>Equipment Status</h1>
+  <button onclick="getStatus()">Equipment Status</button>
+  <pre id="output">Click the button to check equipment status</pre>
+
+ <script>
+  function getStatus() {
+    fetch('http://localhost:3000/equipment/status')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+      })
+      .catch(error => {
+        document.getElementById('output').textContent = 'Error: ' + error.message;
+        console.error(error);
+      });
+  }
+</script>
+</body>
+</html>

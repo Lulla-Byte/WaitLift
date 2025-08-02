@@ -1,8 +1,12 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = 3000;
 
+app.use(cors());
+
 app.get('/equipment/status', (req, res) => {
+  // exmaples of equipment to add to later
   res.status(200).json({ treadmill: 'available', squatRack: 'in-use' });
 });
 
