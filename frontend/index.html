@@ -1,97 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WaitLift</title>
+  <link rel="stylesheet" href="./css/styles.css" />
 </head>
 <body>
-  <h1>Equipment Status</h1>
-  <button onclick="getStatus()">Equipment Status</button>
-  <pre id="output">Click the button to check equipment status</pre>
+ <!-- views will render inside this container -->
+  <div id="app"></div>
 
- <script>
-  function getStatus() {
-    fetch('http://localhost:3000/equipment/status')
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
-      })
-      .catch(error => {
-        document.getElementById('output').textContent = 'Error: ' + error.message;
-        console.error(error);
-      });
-  }
-</script>
+  <script src="./js/equipment.js"></script>
+  <script src="./js/queue.js"></script>
+  <script src="./js/timer.js"></script>
+  <script src="./js/notification.js"></script>
 
-<h2>Queue</h2>
-<button onclick="joinQueue()">Join Queue</button>
-<pre id="queueOutput">Click the button to join the queue</pre>
+  <script src="./js/createWorkout.js"></script>
+  <script src="./js/viewWorkout.js"></script>
+  <script src="./js/home.js"></script>
 
-<script>
-  function joinQueue() {
-  fetch('http://localhost:3000/queue/join', {
-    method: 'POST'
-  })
-    .then(res => res.json())
-    .then(data => {
-      userId = data.user; // store it globally
-      document.getElementById('queueOutput').textContent =
-        `${data.message} You are #${data.position} in line.`;
-    })
-    .catch(err => {
-      document.getElementById('queueOutput').textContent = 'Error: ' + err.message;
-    });
-}
-</script>
-
-<h2>View Queue</h2>
-<button onclick="viewQueue()">View Queue</button>
-<pre id="viewQueueOutput">Click to see the current queue</pre>
-
-<script>
-  function viewQueue() {
-    fetch('http://localhost:3000/queue/view')
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('viewQueueOutput').textContent =
-          `Queue:\n${data.queue.map((user, i) => `${i + 1}. ${user}`).join('\n')}`;
-      })
-      .catch(err => {
-        document.getElementById('viewQueueOutput').textContent = 'Error: ' + err.message;
-        console.error(err);
-      });
-  }
-</script>
-
-<h2>Leave Queue</h2>
-<button onclick="leaveQueue()">Leave Queue</button>
-<pre id="leaveQueueOutput">Click to leave the queue</pre>
-
-<script>
-  function leaveQueue() {
-    if (!userId) {
-      document.getElementById('leaveQueueOutput').textContent = "You're not in the queue.";
-      return;
-    }
-
-    fetch('http://localhost:3000/queue/leave', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user: userId })
-    })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('leaveQueueOutput').textContent = data.message;
-        userId = null;
-        viewQueue(); // automatically refresh the view
-      })
-      .catch(err => {
-        document.getElementById('leaveQueueOutput').textContent = 'Error: ' + err.message;
-      });
-  }
-</script>
-
-
-
+  <script>
+    // load the initial view (home)
+    window.onload = () => {
+      loadHomeView(); // will be defined in home.js
+    };
+  </script>
 </body>
 </html>
