@@ -22,5 +22,76 @@
       });
   }
 </script>
+
+<h2>Queue</h2>
+<button onclick="joinQueue()">Join Queue</button>
+<pre id="queueOutput">Click the button to join the queue</pre>
+
+<script>
+  function joinQueue() {
+  fetch('http://localhost:3000/queue/join', {
+    method: 'POST'
+  })
+    .then(res => res.json())
+    .then(data => {
+      userId = data.user; // store it globally
+      document.getElementById('queueOutput').textContent =
+        `${data.message} You are #${data.position} in line.`;
+    })
+    .catch(err => {
+      document.getElementById('queueOutput').textContent = 'Error: ' + err.message;
+    });
+}
+</script>
+
+<h2>View Queue</h2>
+<button onclick="viewQueue()">View Queue</button>
+<pre id="viewQueueOutput">Click to see the current queue</pre>
+
+<script>
+  function viewQueue() {
+    fetch('http://localhost:3000/queue/view')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('viewQueueOutput').textContent =
+          `Queue:\n${data.queue.map((user, i) => `${i + 1}. ${user}`).join('\n')}`;
+      })
+      .catch(err => {
+        document.getElementById('viewQueueOutput').textContent = 'Error: ' + err.message;
+        console.error(err);
+      });
+  }
+</script>
+
+<h2>Leave Queue</h2>
+<button onclick="leaveQueue()">Leave Queue</button>
+<pre id="leaveQueueOutput">Click to leave the queue</pre>
+
+<script>
+  function leaveQueue() {
+    if (!userId) {
+      document.getElementById('leaveQueueOutput').textContent = "You're not in the queue.";
+      return;
+    }
+
+    fetch('http://localhost:3000/queue/leave', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user: userId })
+    })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('leaveQueueOutput').textContent = data.message;
+        userId = null;
+        viewQueue(); // automatically refresh the view
+      })
+      .catch(err => {
+        document.getElementById('leaveQueueOutput').textContent = 'Error: ' + err.message;
+      });
+  }
+</script>
+
+
+
 </body>
 </html>
