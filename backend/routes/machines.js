@@ -61,5 +61,27 @@ router.post('/join-queue', (req, res) => {
   res.status(200).json({ message: 'Joined queue', queue: machine.queue });
 });
 
+router.put('/:name/leave-queue', (req, res) => {
+  const { name } = req.params;
+  const { userId } = req.body;
+  const machine = machines.find(m => m.name === name);
+
+  if (!machine) {
+    return res.status(404).json({ error: 'Machine not found' });
+  }
+
+  const index = machine.queue.indexOf(userId);
+  if (index !== -1) {
+    machine.queue.splice(index, 1);
+  }
+
+  if (machine.queue.length === 0) {
+    machine.status = 'Available';
+  }
+
+  res.json({ message: 'Left queue', machine });
+});
+
+
 
 module.exports = router;

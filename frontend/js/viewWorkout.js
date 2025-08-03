@@ -29,22 +29,22 @@ function renderMachine(machine, userId) {
   let actionBtn = '';
 
   const isInQueue = machine.queue.includes(userId);
+  const position = machine.queue.indexOf(userId);
   const isNext = machine.queue[0] === userId;
 
   // Determine action based on status and queue position
   if (isNext) {
     statusLabel += ` — You're Up!`;
     actionBtn = `<button onclick="finishMachine('${machine.name}')">Finish</button>`;
-  } else if (machine.status === 'Busy') {
-    if (isInQueue) {
-      statusLabel += ` — In Queue`;
-    } else {
+  } else if (isInQueue) {
+    statusLabel += ` — In Queue (Position ${position + 1})`;
+    actionBtn = `<button onclick="leaveQueue('${machine.name}')">Leave Queue</button>`;
+  } else {
+    // user not in queue
+    if (machine.status === 'Busy' || machine.status === 'Available') {
       actionBtn = `<button onclick="joinQueue('${machine.name}')">Join Queue</button>`;
     }
-  } else if (!isInQueue) {
-    actionBtn = `<button onclick="joinQueue('${machine.name}')">Join Queue</button>`;
   }
-
   return `
     <li>
       <strong>${machine.name}</strong><br/>
@@ -125,3 +125,37 @@ function joinQueue(machineName) {
       alert("Error joining queue: " + err.message);
     });
 }
+
+// function to leave the queue for a machine
+function leaveQueue(machineName) {
+  const userId = localStorage.getItem('userId');
+
+  fetch(`http://localhost:3000/machines`)
+    .then(res => res.json())
+    .then(allMachines => {
+      const machine = allMachines.find(m => m.name === machineName);
+      if (!machine) return;
+
+      const index = machine.queue.indexOf(userId);
+      if (index !== -1) {
+        machine.queue.splice(index, 1); // Remove from queue
+
+        // Update status if the user was first in line
+        if (index === 0) {
+          if (machine.queue.length === 0) {
+            machine.status = 'Available';
+          }
+        }
+
+        // Send PUT request to leave queue
+        return fetch(`http://localhost:3000/machines/${encodeURIComponent(machineName)}/leave-queue`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId })
+        });
+      }
+    })
+    .then(() => fetchAndRenderMachines())
+    .catch(err => console.error('Failed to leave queue:', err));
+}
+
