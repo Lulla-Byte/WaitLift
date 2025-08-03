@@ -11,4 +11,7 @@ router.get('/current/:userId', workoutController.getCurrentMachine);
 // advance to next machine
 router.post('/advance', workoutController.advanceWorkout);
 
+// create a new workout plan based on category
+router.post('/create', workoutController.createWorkoutPlan);
+
 module.exports = router;

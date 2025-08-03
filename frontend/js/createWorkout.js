@@ -1,20 +1,55 @@
 function createWorkout(category) {
   fetch('http://localhost:3000/workout/create', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ category }) // send selected category to backend
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ category }) // Send selected category to backend
   })
     .then(res => res.json())
     .then(data => {
-      console.log('Workout created:', data);
+    const machines = data.queue;
+    const app = document.getElementById('app');
+    const selectedQueue = JSON.parse(localStorage.getItem('workoutQueue')) || [];
+
+    // Render machine selection UI
+    app.innerHTML = `
+      <h2>Select Equipment for ${category}</h2>
+      <form id="machineSelectionForm">
+        ${machines
+          .map(name => {
+            const checked = selectedQueue.includes(name) ? 'checked' : '';
+            return `
+              <div>
+                <input type="checkbox" id="${name}" name="equipment" value="${name}" ${checked}>
+                <label for="${name}">${name}</label>
+              </div>
+            `;
+          })
+          .join('')}
+
+      </form>
+      <button id="startWorkoutBtn">Start Workout</button>
+      <button id="goBackBtn">← Back to Home</button>
+    `;
+
+    // Start workout button logic
+    document.getElementById('startWorkoutBtn').onclick = () => {
+      const selected = Array.from(
+        document.querySelectorAll('input[name="equipment"]:checked')
+      ).map(checkbox => checkbox.value);
+
+      if (selected.length === 0) {
+        alert("Please select at least one machine to continue.");
+        return;
+      }
+
       localStorage.setItem('hasWorkout', 'true');
-      loadViewWorkoutView(); // load the view workout screen next
-    })
-    .catch(err => {
-      console.error('Error creating workout:', err);
-    });
+      localStorage.setItem('workoutQueue', JSON.stringify(selected));
+      loadViewWorkoutView();
+    };
+
+    // Back button
+    document.getElementById('goBackBtn').onclick = loadHomeView;
+  });
 }
 
 function loadCreateWorkoutView() {

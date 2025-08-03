@@ -1,5 +1,36 @@
 const queues = {};
 const workoutPlans = {}; 
+const path = require('path');
+const fs = require('fs');
+
+exports.createWorkoutPlan = (req, res) => {
+  const { category } = req.body;
+
+  if (!category) {
+    return res.status(400).json({ error: "Category is required" });
+  }
+
+  const filePath = path.join(__dirname, '../data/equipment.json');
+
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading equipment.json:', err);
+      return res.status(500).json({ error: "Could not load equipment data" });
+    }
+
+    try {
+      const equipmentList = JSON.parse(data);
+      const queue = equipmentList
+        .filter(machine => machine.categories.includes(category))
+        .map(machine => machine.name); // just send machine names for now
+
+      res.status(200).json({ queue });
+    } catch (parseError) {
+      console.error('Error parsing equipment data:', parseError);
+      return res.status(500).json({ error: "Failed to parse equipment data" });
+    }
+  });
+};
 
 exports.startWorkout = (req, res) => {
    const { userId, plan } = req.body;
