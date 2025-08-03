@@ -1,59 +1,55 @@
 function createWorkout(category) {
-  fetch('http://localhost:3000/workout/create', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ category }) // Send selected category to backend
-  })
+  fetch('http://localhost:3000/machines')
     .then(res => res.json())
     .then(data => {
-    const machines = data.queue;
-    const app = document.getElementById('app');
-    const selectedQueue = JSON.parse(localStorage.getItem('workoutQueue')) || [];
+      // Filter machines by category and prepare the selection form
+      const machines = data
+        .filter(machine => machine.categories.includes(category))
+        .map(machine => machine.name);
+      const selectedQueue = JSON.parse(localStorage.getItem('workoutQueue')) || [];
+      const app = document.getElementById('app');
 
-    // Render machine selection UI
-    app.innerHTML = `
-      <h2>Select Equipment for ${category}</h2>
-      <form id="machineSelectionForm">
-        ${machines
-          .map(name => {
-            const checked = selectedQueue.includes(name) ? 'checked' : '';
-            return `
-              <div>
-                <input type="checkbox" id="${name}" name="equipment" value="${name}" ${checked}>
-                <label for="${name}">${name}</label>
-              </div>
-            `;
-          })
-          .join('')}
+      app.innerHTML = `
+        <h2>Select Equipment for ${category}</h2>
+        <form id="machineSelectionForm">
+          ${machines
+            .map(name => {
+              const checked = selectedQueue.includes(name) ? 'checked' : '';
+              return `
+                <div>
+                  <input type="checkbox" id="${name}" name="equipment" value="${name}" ${checked}>
+                  <label for="${name}">${name}</label>
+                </div>
+              `;
+            })
+            .join('')}
+        </form>
+        <button id="startWorkoutBtn">Start Workout</button>
+        <button id="goBackBtn">← Back to Home</button>
+      `;
 
-      </form>
-      <button id="startWorkoutBtn">Start Workout</button>
-      <button id="goBackBtn">← Back to Home</button>
-    `;
+      // TODO: need to replace localStorage with POST to backend later
+      // will update the UI later
+      document.getElementById('startWorkoutBtn').onclick = () => {
+        const selected = Array.from(
+          document.querySelectorAll('input[name="equipment"]:checked')
+        ).map(checkbox => checkbox.value);
 
-    // Start workout button logic
-    document.getElementById('startWorkoutBtn').onclick = () => {
-      const selected = Array.from(
-        document.querySelectorAll('input[name="equipment"]:checked')
-      ).map(checkbox => checkbox.value);
+        if (selected.length === 0) {
+          alert("Please select at least one machine to continue");
+          return;
+        }
 
-      if (selected.length === 0) {
-        alert("Please select at least one machine to continue.");
-        return;
-      }
+        localStorage.setItem('hasWorkout', 'true');
+        localStorage.setItem('workoutQueue', JSON.stringify(selected));
+        loadViewWorkoutView();
+      };
 
-      localStorage.setItem('hasWorkout', 'true');
-      localStorage.setItem('workoutQueue', JSON.stringify(selected));
-      loadViewWorkoutView();
-    };
-
-    // Back button
-    document.getElementById('goBackBtn').onclick = loadHomeView;
-  });
+      document.getElementById('goBackBtn').onclick = loadHomeView;
+    });
 }
 
 function loadCreateWorkoutView() {
-  console.log('Create Workout view loaded');
   const app = document.getElementById('app');
   app.innerHTML = `
     <h2>Select Your Workout Type</h2>
@@ -66,7 +62,6 @@ function loadCreateWorkoutView() {
     <button id="goBackBtn">← Back to Home</button>
   `;
 
-  //click handlers to each category button
   const buttons = document.querySelectorAll('#category-buttons button');
   buttons.forEach(btn => {
     btn.onclick = () => {

@@ -10,20 +10,15 @@
  <!-- views will render inside this container -->
   <div id="app"></div>
 
-  <script src="./js/equipment.js"></script>
-  <script src="./js/queue.js"></script>
-  <script src="./js/timer.js"></script>
-  <script src="./js/notification.js"></script>
+<script src="./js/createWorkout.js"></script>
+<script src="./js/viewWorkout.js"></script>
+<script src="./js/home.js"></script>
 
-  <script src="./js/createWorkout.js"></script>
-  <script src="./js/viewWorkout.js"></script>
-  <script src="./js/home.js"></script>
+<script>
+  window.onload = () => {
+    loadHomeView();
+  };
+</script>
 
-  <script>
-    // load the initial view (home)
-    window.onload = () => {
-      loadHomeView(); // will be defined in home.js
-    };
-  </script>
 </body>
 </html>

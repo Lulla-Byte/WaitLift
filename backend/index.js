@@ -6,19 +6,12 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-const workoutRoutes = require('./routes/workout');
-app.use('/workout', workoutRoutes);
-
-const queueRoutes = require('./routes/queue');
-app.use('/queue', queueRoutes);
-
-app.get('/equipment/status', (req, res) => {
-  // exmaples of equipment to add to later
-  res.status(200).json({ treadmill: 'available', squatRack: 'in-use' });
-});
+const machinesRoutes = require('./routes/machines');
+app.use('/machines', machinesRoutes);
 
 if (require.main === module) {
   app.listen(port, () => console.log(`WaitLift backend running on port ${port}`));
 }
 
 module.exports = app;
+
