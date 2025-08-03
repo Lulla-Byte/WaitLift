@@ -23,26 +23,6 @@ function loadViewWorkoutView() {
   window._machineInterval = setInterval(fetchAndRenderMachines, 5000);
 }
 
-  // fetch live machine data from backend
-  fetch('http://localhost:3000/machines')
-    .then(res => res.json())
-    .then(allMachines => {
-      // show machines selected by the user
-      const selectedMachines = allMachines.filter(m =>
-        workoutQueue.includes(m.name)
-      );
-
-      app.innerHTML = `
-        <h2>My Workout</h2>
-        <ul>
-          ${selectedMachines.map(machine => renderMachine(machine, userId)).join('')}
-        </ul>
-        <button id="backBtn">← Back to Home</button>
-      `;
-
-      document.getElementById('backBtn').onclick = loadHomeView;
-    });
-
 // Helper function to render each machine
 function renderMachine(machine, userId) {
   let statusLabel = `Status: ${machine.status}`;
@@ -51,13 +31,17 @@ function renderMachine(machine, userId) {
   const isInQueue = machine.queue.includes(userId);
   const isNext = machine.queue[0] === userId;
 
-  if (machine.status === 'Available') {
-    actionBtn = `<button onclick="startTimer('${machine.name}')">Start Timer</button>`;
-  } else if (isNext) {
+  // Determine action based on status and queue position
+  if (isNext) {
     statusLabel += ` — You're Up!`;
-  } else if (isInQueue) {
-    statusLabel += ` — In Queue`;
-  } else {
+    actionBtn = `<button onclick="finishMachine('${machine.name}')">Finish</button>`;
+  } else if (machine.status === 'Busy') {
+    if (isInQueue) {
+      statusLabel += ` — In Queue`;
+    } else {
+      actionBtn = `<button onclick="joinQueue('${machine.name}')">Join Queue</button>`;
+    }
+  } else if (!isInQueue) {
     actionBtn = `<button onclick="joinQueue('${machine.name}')">Join Queue</button>`;
   }
 
@@ -74,6 +58,8 @@ function renderMachine(machine, userId) {
 function fetchAndRenderMachines() {
   const workoutQueue = JSON.parse(localStorage.getItem('workoutQueue') || '[]');
   const userId = localStorage.getItem('userId');
+  const app = document.getElementById('app');
+  if (!app) return;
 
   fetch('http://localhost:3000/machines')
     .then(res => res.json())
@@ -82,7 +68,6 @@ function fetchAndRenderMachines() {
         workoutQueue.includes(m.name)
       );
 
-      const app = document.getElementById('app');
       app.innerHTML = `
         <h2>My Workout</h2>
         <ul>
@@ -93,38 +78,38 @@ function fetchAndRenderMachines() {
 
       document.getElementById('backBtn').onclick = loadHomeView;
     });
+
+  if (window._machineInterval) {
+    clearInterval(window._machineInterval);
+  }
+  window._machineInterval = setInterval(fetchAndRenderMachines, 3000);
 }
 
 
-// function to start the timer for a machine
-// need to add a countdown
-function startTimer(machineName) {
+// replaced start timer function with finish button
+function finishMachine(machineName) {
   const userId = localStorage.getItem('userId');
 
-  fetch('http://localhost:3000/machines/start-timer', {
+  fetch('http://localhost:3000/machines/finish', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ machineName, userId })
   })
-    .then(res => {
-      if (!res.ok) throw new Error('Failed to start timer');
-      return res.json();
-    })
+    .then(res => res.json())
     .then(() => {
-      // Re-render view to reflect updated status
-      loadViewWorkoutView();
+      fetchAndRenderMachines();
     })
     .catch(err => {
-      alert(`Error: ${err.message}`);
+      alert("Failed to finish machine: " + err.message);
     });
 }
 
+
 // function to join the queue for a machine
-// will update logic but button works for now
 function joinQueue(machineName) {
   const userId = localStorage.getItem('userId');
 
-  fetch('http://localhost:3000/machines/start-timer', {
+  fetch('http://localhost:3000/machines/join-queue', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ machineName, userId })
@@ -134,9 +119,9 @@ function joinQueue(machineName) {
       return res.json();
     })
     .then(() => {
-      loadViewWorkoutView(); // refresh UI
+      fetchAndRenderMachines(); // Refresh after joining
     })
     .catch(err => {
-      alert(`Error: ${err.message}`);
+      alert("Error joining queue: " + err.message);
     });
 }

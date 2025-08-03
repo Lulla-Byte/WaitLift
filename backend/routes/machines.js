@@ -24,48 +24,42 @@ router.get('/', (req, res) => {
   res.status(200).json(machines);
 });
 
-// POST /machines/start-timer
-// { machineName: string, userId: string }
-router.post('/start-timer', (req, res) => {
+router.post('/finish', (req, res) => {
   const { machineName, userId } = req.body;
-
   const machine = machines.find(m => m.name === machineName);
+
   if (!machine) {
     return res.status(404).json({ error: 'Machine not found' });
   }
 
-  if (machine.status === 'Busy') {
-    return res.status(400).json({ error: 'Machine already in use' });
+  // Remove the user from the queue
+  machine.queue = machine.queue.filter(id => id !== userId);
+
+  // Set new status
+  if (machine.queue.length > 0) {
+    machine.status = 'Busy';
+  } else {
+    machine.status = 'Available';
   }
 
-  machine.status = 'Busy';
+  res.json({ message: 'Machine finished', machine });
+});
+
+router.post('/join-queue', (req, res) => {
+  const { machineName, userId } = req.body;
+  const machine = machines.find(m => m.name === machineName);
+
+  if (!machine) {
+    return res.status(404).json({ error: 'Machine not found' });
+  }
 
   if (!machine.queue.includes(userId)) {
     machine.queue.push(userId);
+    machine.status = 'Busy';
   }
 
-  res.status(200).json({ message: 'Timer started', machine });
+  res.status(200).json({ message: 'Joined queue', queue: machine.queue });
 });
 
-// POST /machines/end-timer
-// { machineName: string }
-router.post('/end-timer', (req, res) => {
-  const { machineName } = req.body;
-
-  const machine = machines.find(m => m.name === machineName);
-  if (!machine) {
-    return res.status(404).json({ error: 'Machine not found' });
-  }
-
-  machine.status = 'Available';
-
-  //remove the first user in line (the one who just used it)
-  machine.queue.shift();
-
-  res.status(200).json({
-    message: 'Machine is now available',
-    machine
-  });
-});
 
 module.exports = router;

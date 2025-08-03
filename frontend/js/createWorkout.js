@@ -9,40 +9,66 @@ function createWorkout(category) {
       const selectedQueue = JSON.parse(localStorage.getItem('workoutQueue')) || [];
       const app = document.getElementById('app');
 
-      app.innerHTML = `
-        <h2>Select Equipment for ${category}</h2>
-        <form id="machineSelectionForm">
-          ${machines
-            .map(name => {
-              const checked = selectedQueue.includes(name) ? 'checked' : '';
-              return `
-                <div>
-                  <input type="checkbox" id="${name}" name="equipment" value="${name}" ${checked}>
-                  <label for="${name}">${name}</label>
-                </div>
-              `;
-            })
-            .join('')}
-        </form>
-        <button id="startWorkoutBtn">Start Workout</button>
-        <button id="goBackBtn">← Back to Home</button>
-      `;
+          app.innerHTML = `
+      <h2>Select Equipment for ${category}</h2>
+      <form id="machineSelectionForm">
+        ${machines
+              .map(name => {
+                const checked = selectedQueue.includes(name) ? 'checked' : '';
+                return `
+              <div>
+                <input type="checkbox" id="${name}" name="equipment" value="${name}" ${checked}>
+                <label for="${name}">${name}</label>
+              </div>
+            `;
+              })
+              .join('')}
+      </form>
+      <button id="saveBtn">Save Selection</button>
+      <button id="startWorkoutBtn">Start Workout</button>
+      <button id="goBackBtn">← Back to Home</button>
+    `;
 
       // TODO: need to replace localStorage with POST to backend later
       // will update the UI later
+      document.getElementById('saveBtn').onclick = () => {
+        const selected = Array.from(
+          document.querySelectorAll('input[name="equipment"]:checked')
+        ).map(checkbox => checkbox.value);
+
+        const existingQueue = JSON.parse(localStorage.getItem('workoutQueue')) || [];
+        const filtered = existingQueue.filter(name => !machines.includes(name));
+        const updatedQueue = [...filtered, ...selected];
+
+        if (updatedQueue.length === 0) {
+          alert("Your workout can't be empty. Please select at least one machine.");
+          return;
+        }
+
+        localStorage.setItem('hasWorkout', 'true');
+        localStorage.setItem('workoutQueue', JSON.stringify(updatedQueue));
+
+        alert("Saved! You can now select another category or start your workout.");
+        loadCreateWorkoutView(); // stay on category screen
+      };
+
       document.getElementById('startWorkoutBtn').onclick = () => {
         const selected = Array.from(
           document.querySelectorAll('input[name="equipment"]:checked')
         ).map(checkbox => checkbox.value);
 
-        if (selected.length === 0) {
-          alert("Please select at least one machine to continue");
+        const existingQueue = JSON.parse(localStorage.getItem('workoutQueue')) || [];
+        const filtered = existingQueue.filter(name => !machines.includes(name));
+        const updatedQueue = [...filtered, ...selected];
+
+        if (updatedQueue.length === 0) {
+          alert("Your workout can't be empty. Please select at least one machine.");
           return;
         }
 
         localStorage.setItem('hasWorkout', 'true');
-        localStorage.setItem('workoutQueue', JSON.stringify(selected));
-        loadViewWorkoutView();
+        localStorage.setItem('workoutQueue', JSON.stringify(updatedQueue));
+        loadViewWorkoutView(); // now go to workout view
       };
 
       document.getElementById('goBackBtn').onclick = loadHomeView;
@@ -71,4 +97,29 @@ function loadCreateWorkoutView() {
   });
 
   document.getElementById('goBackBtn').onclick = loadHomeView;
+}
+
+function handleSaveOrStart(shouldStartWorkout) {
+  const selected = Array.from(
+    document.querySelectorAll('input[name="equipment"]:checked')
+  ).map(checkbox => checkbox.value);
+
+  const existingQueue = JSON.parse(localStorage.getItem('workoutQueue')) || [];
+  const filtered = existingQueue.filter(name => !machines.includes(name));
+  const updatedQueue = [...filtered, ...selected];
+
+  if (updatedQueue.length === 0) {
+    alert("Your workout can't be empty. Please select at least one machine.");
+    return;
+  }
+
+  localStorage.setItem('hasWorkout', 'true');
+  localStorage.setItem('workoutQueue', JSON.stringify(updatedQueue));
+
+  if (shouldStartWorkout) {
+    loadViewWorkoutView();
+  } else {
+    alert("Saved! You can select another category.");
+    loadCreateWorkoutView();
+  }
 }
