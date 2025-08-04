@@ -1,8 +1,0 @@
-[
-  { "name": "Treadmill", "categories": ["Cardio"], "available": true },
-  { "name": "Leg Press", "categories": ["Lower"], "available": true },
-  { "name": "Pull-up Bar", "categories": ["Upper"], "available": false },
-  { "name": "Rowing Machine", "categories": ["Full", "Cardio"], "available": true },
-  { "name": "Squat Rack", "categories": ["Lower", "Full"], "available": true },
-  { "name": "Bench Press", "categories": ["Upper", "Full"], "available": false }
-]
