@@ -1,11 +1,6 @@
-let API_URL = '';
-fetch('./config.json')
-  .then(res => res.json())
-  .then(config => {
-    API_URL = window.location.hostname === 'localhost'
-      ? config.LOCALHOST
-      : config.PROD;
-  });
+const API_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:3000'
+  : 'https://waitlift-service.onrender.com';
 
 function loadHomeView() {
   const app = document.getElementById('app');
