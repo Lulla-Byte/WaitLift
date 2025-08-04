@@ -1,3 +1,8 @@
+import config from './config.json';
+const API_URL = window.location.hostname === 'localhost'
+  ? config.LOCALHOST
+  : config.PROD;
+
 function loadViewWorkoutView() {
   const app = document.getElementById('app');
   app.innerHTML = `<h2>Loading your workout...</h2>`;
@@ -61,7 +66,7 @@ function fetchAndRenderMachines() {
   const app = document.getElementById('app');
   if (!app) return;
 
-  fetch('http://localhost:3000/machines')
+  fetch(`${API_URL}/machines`)
     .then(res => res.json())
     .then(allMachines => {
       const selectedMachines = allMachines.filter(m =>
@@ -90,7 +95,7 @@ function fetchAndRenderMachines() {
 function finishMachine(machineName) {
   const userId = localStorage.getItem('userId');
 
-  fetch('http://localhost:3000/machines/finish', {
+  fetch(`${API_URL}/machines/finish`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ machineName, userId })
@@ -109,7 +114,7 @@ function finishMachine(machineName) {
 function joinQueue(machineName) {
   const userId = localStorage.getItem('userId');
 
-  fetch('http://localhost:3000/machines/join-queue', {
+  fetch(`${API_URL}/machines/join-queue`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ machineName, userId })
@@ -130,7 +135,7 @@ function joinQueue(machineName) {
 function leaveQueue(machineName) {
   const userId = localStorage.getItem('userId');
 
-  fetch(`http://localhost:3000/machines`)
+  fetch(`${API_URL}/machines`)
     .then(res => res.json())
     .then(allMachines => {
       const machine = allMachines.find(m => m.name === machineName);
@@ -148,7 +153,7 @@ function leaveQueue(machineName) {
         }
 
         // Send PUT request to leave queue
-        return fetch(`http://localhost:3000/machines/${encodeURIComponent(machineName)}/leave-queue`, {
+        return fetch(`${API_URL}/machines/${encodeURIComponent(machineName)}/leave-queue`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId })

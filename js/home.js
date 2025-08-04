@@ -1,3 +1,8 @@
+import config from './config.json';
+const API_URL = window.location.hostname === 'localhost'
+  ? config.LOCALHOST
+  : config.PROD;
+
 function loadHomeView() {
   const app = document.getElementById('app');
   const hasWorkout = localStorage.getItem('hasWorkout') === 'true';
@@ -16,7 +21,7 @@ function loadHomeView() {
     <button id="createWorkoutBtn">${hasValidWorkout ? 'Modify' : 'Create'} Workout</button>
   `;
 
-  fetch('http://localhost:3000/machines')
+  fetch(`${API_URL}/machines`)
   .then(res => res.json())
   .then(allMachines => {
     const busyCount = allMachines.filter(m => m.status === "Busy").length;

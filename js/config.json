@@ -1,0 +1,4 @@
+{
+    "LOCALHOST": "http://localhost:3000",
+    "PROD": "https://waitlift-service.onrender.com"
+}

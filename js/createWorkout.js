@@ -1,5 +1,10 @@
+import config from './config.json';
+const API_URL = window.location.hostname === 'localhost'
+  ? config.LOCALHOST
+  : config.PROD;
+
 function createWorkout(category) {
-  fetch('http://localhost:3000/machines')
+  fetch(`${API_URL}/machines`)
     .then(res => res.json())
     .then(data => {
       // Filter machines by category and prepare the selection form
