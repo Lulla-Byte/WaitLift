@@ -1,4 +1,4 @@
-const API_URL = window.location.hostname === 'waitlift-service.onrender'
+const API_URL = window.location.hostname.includes('github.io')
   ? 'https://waitlift-service.onrender.com'
   : 'http://localhost:3000';
 
@@ -26,37 +26,6 @@ function loadViewWorkoutView() {
   if (window._machineInterval) clearInterval(window._machineInterval);
   window._machineInterval = setInterval(fetchAndRenderMachines, 5000);
 }
-
-// Helper function to render each machine
-// function renderMachine(machine, userId) {
-//   let statusLabel = `Status: ${machine.status}`;
-//   let actionBtn = '';
-
-//   const isInQueue = machine.queue.includes(userId);
-//   const position = machine.queue.indexOf(userId);
-//   const isNext = machine.queue[0] === userId;
-
-//   // Determine action based on status and queue position
-//   if (isNext) {
-//     statusLabel += ` — You're Up!`;
-//     actionBtn = `<button onclick="finishMachine('${machine.name}')">Finish</button>`;
-//   } else if (isInQueue) {
-//     statusLabel += ` — In Queue (Position ${position + 1})`;
-//     actionBtn = `<button onclick="leaveQueue('${machine.name}')">Leave Queue</button>`;
-//   } else {
-//     // user not in queue
-//     if (machine.status === 'Busy' || machine.status === 'Available') {
-//       actionBtn = `<button onclick="joinQueue('${machine.name}')">Join Queue</button>`;
-//     }
-//   }
-//   return `
-//     <li>
-//       <strong>${machine.name}</strong><br/>
-//       ${statusLabel}<br/>
-//       ${actionBtn}
-//     </li>
-//   `;
-// }
 
 function renderMachine(machine, userId) {
   const isInQueue = machine.queue.includes(userId);
