@@ -1,6 +1,6 @@
-const API_URL = window.location.hostname === 'localhost'
-  ? 'http://localhost:3000'
-  : 'https://waitlift-service.onrender.com';
+const API_URL = window.location.hostname === 'waitlift-service.onrender'
+  ? 'https://waitlift-service.onrender.com'
+  : 'http://localhost:3000';
 
 function loadViewWorkoutView() {
   const app = document.getElementById('app');
