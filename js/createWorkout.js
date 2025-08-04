@@ -1,4 +1,3 @@
-let API_URL = '';
 fetch('./config.json')
   .then(res => res.json())
   .then(config => {
