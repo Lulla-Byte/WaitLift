@@ -28,35 +28,67 @@ function loadViewWorkoutView() {
 }
 
 // Helper function to render each machine
-function renderMachine(machine, userId) {
-  let statusLabel = `Status: ${machine.status}`;
-  let actionBtn = '';
+// function renderMachine(machine, userId) {
+//   let statusLabel = `Status: ${machine.status}`;
+//   let actionBtn = '';
 
+//   const isInQueue = machine.queue.includes(userId);
+//   const position = machine.queue.indexOf(userId);
+//   const isNext = machine.queue[0] === userId;
+
+//   // Determine action based on status and queue position
+//   if (isNext) {
+//     statusLabel += ` — You're Up!`;
+//     actionBtn = `<button onclick="finishMachine('${machine.name}')">Finish</button>`;
+//   } else if (isInQueue) {
+//     statusLabel += ` — In Queue (Position ${position + 1})`;
+//     actionBtn = `<button onclick="leaveQueue('${machine.name}')">Leave Queue</button>`;
+//   } else {
+//     // user not in queue
+//     if (machine.status === 'Busy' || machine.status === 'Available') {
+//       actionBtn = `<button onclick="joinQueue('${machine.name}')">Join Queue</button>`;
+//     }
+//   }
+//   return `
+//     <li>
+//       <strong>${machine.name}</strong><br/>
+//       ${statusLabel}<br/>
+//       ${actionBtn}
+//     </li>
+//   `;
+// }
+
+function renderMachine(machine, userId) {
   const isInQueue = machine.queue.includes(userId);
   const position = machine.queue.indexOf(userId);
   const isNext = machine.queue[0] === userId;
 
-  // Determine action based on status and queue position
+  let statusText = machine.status;
+  let statusClass = machine.status === 'Available' ? 'available' : 'busy';
+  let actionBtn = '';
+
   if (isNext) {
-    statusLabel += ` — You're Up!`;
-    actionBtn = `<button onclick="finishMachine('${machine.name}')">Finish</button>`;
+    statusText += " — You're Up!";
+    actionBtn = `<button class="queue-btn" onclick="finishMachine('${machine.name}')">Finish</button>`;
   } else if (isInQueue) {
-    statusLabel += ` — In Queue (Position ${position + 1})`;
-    actionBtn = `<button onclick="leaveQueue('${machine.name}')">Leave Queue</button>`;
+    statusText += ` — In Queue (Position ${position + 1})`;
+    actionBtn = `<button class="queue-btn" onclick="leaveQueue('${machine.name}')">Leave Queue</button>`;
   } else {
-    // user not in queue
-    if (machine.status === 'Busy' || machine.status === 'Available') {
-      actionBtn = `<button onclick="joinQueue('${machine.name}')">Join Queue</button>`;
-    }
+    actionBtn = `<button class="queue-btn" onclick="joinQueue('${machine.name}')">Join Queue</button>`;
   }
+
   return `
-    <li>
-      <strong>${machine.name}</strong><br/>
-      ${statusLabel}<br/>
-      ${actionBtn}
-    </li>
-  `;
+  <div class="machine-card">
+    <div class="machine-name">${machine.name}</div>
+    <div class="machine-status-line">
+      <span class="machine-status-label">Status:</span>
+      <span class="machine-status ${statusClass}">${machine.status}${isNext ? " — You're Up!" : isInQueue ? ` — In Queue (Pos ${position + 1})` : ''}</span>
+    </div>
+    ${actionBtn}
+  </div>
+`;
 }
+
 
 // Fetch machines and render them in the workout view
 function fetchAndRenderMachines() {
@@ -73,13 +105,14 @@ function fetchAndRenderMachines() {
       );
 
       app.innerHTML = `
-        <h2>My Workout</h2>
-        <ul>
-          ${selectedMachines.map(machine => renderMachine(machine, userId)).join('')}
-        </ul>
-        <button id="backBtn">← Back to Home</button>
+        <div class="my-workout-container">
+          <h2>My Workout</h2>
+          <div class="machine-list">
+            ${selectedMachines.map(machine => renderMachine(machine, userId)).join('')}
+          </div>
+          <button class="back-btn" id="backBtn">← Back to Home</button>
+        </div>
       `;
-
       document.getElementById('backBtn').onclick = loadHomeView;
     });
 
