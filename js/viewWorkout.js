@@ -31,6 +31,7 @@ function renderMachine(machine, userId) {
   const isInQueue = machine.queue.includes(userId);
   const position = machine.queue.indexOf(userId);
   const isNext = machine.queue[0] === userId;
+  const cardClass = isNext ? 'machine-card youre-up' : 'machine-card';
 
   let statusText = machine.status;
   let statusClass = machine.status === 'Available' ? 'available' : 'busy';
@@ -47,11 +48,16 @@ function renderMachine(machine, userId) {
   }
 
   return `
-  <div class="machine-card">
-    <div class="machine-name">${machine.name}</div>
+    <div class="${cardClass}">
+        <div class="machine-name">
+      ${machine.name}
+      ${isNext ? `<span class="badge youre-up">You're Up!</span>` : ''}
+    </div>
     <div class="machine-status-line">
       <span class="machine-status-label">Status:</span>
-      <span class="machine-status ${statusClass}">${machine.status}${isNext ? " — You're Up!" : isInQueue ? ` — In Queue (Pos ${position + 1})` : ''}</span>
+      <span class="machine-status ${statusClass}">
+         ${machine.status}${isInQueue && !isNext ? ` — In Queue (Position ${position + 1})` : ''}
+      </span>
     </div>
     ${actionBtn}
   </div>
