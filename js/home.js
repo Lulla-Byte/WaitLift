@@ -1,7 +1,11 @@
-import config from './config.json';
-const API_URL = window.location.hostname === 'localhost'
-  ? config.LOCALHOST
-  : config.PROD;
+let API_URL = '';
+fetch('./config.json')
+  .then(res => res.json())
+  .then(config => {
+    API_URL = window.location.hostname === 'localhost'
+      ? config.LOCALHOST
+      : config.PROD;
+  });
 
 function loadHomeView() {
   const app = document.getElementById('app');
