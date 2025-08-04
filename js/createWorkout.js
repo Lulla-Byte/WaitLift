@@ -1,7 +1,7 @@
-const API_URL = window.location.hostname === 'localhost'
-  ? 'http://localhost:3000'
-  : 'https://waitlift-service.onrender.com';
-  
+// const API_URL = window.location.hostname === 'localhost'
+//   ? 'http://localhost:3000'
+//   : 'https://waitlift-service.onrender.com';
+
 function createWorkout(category) {
   fetch(`${API_URL}/machines`)
     .then(res => res.json())
