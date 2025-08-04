@@ -1,7 +1,3 @@
-// const API_URL = window.location.hostname === 'localhost'
-  // ? 'http://localhost:3000'
-  // : 'https://waitlift-service.onrender.com';
-
 function loadHomeView() {
   const app = document.getElementById('app');
   const hasWorkout = localStorage.getItem('hasWorkout') === 'true';
@@ -16,8 +12,11 @@ function loadHomeView() {
 
   app.innerHTML = `
     <h1>WaitLift</h1>
-    <button id="viewWorkoutBtn">View Workout</button>
-    <button id="createWorkoutBtn">${hasValidWorkout ? 'Modify' : 'Create'} Workout</button>
+  </div>
+    <div class="button-row">
+      <button id="viewWorkoutBtn">View Workout</button>
+      <button id="createWorkoutBtn">${hasValidWorkout ? 'Modify' : 'Create'} Workout</button>
+    </div>
   `;
 
   fetch(`${API_URL}/machines`)
@@ -35,6 +34,7 @@ function loadHomeView() {
     }
 
     const statusElement = document.createElement('p');
+    statusElement.className = 'status';
     statusElement.innerHTML = `<strong>${gymStatus}</strong>`;
     app.prepend(statusElement);
   });

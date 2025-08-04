@@ -1,7 +1,3 @@
-// const API_URL = window.location.hostname === 'localhost'
-//   ? 'http://localhost:3000'
-//   : 'https://waitlift-service.onrender.com';
-
 function createWorkout(category) {
   fetch(`${API_URL}/machines`)
     .then(res => res.json())
@@ -13,25 +9,30 @@ function createWorkout(category) {
       const selectedQueue = JSON.parse(localStorage.getItem('workoutQueue')) || [];
       const app = document.getElementById('app');
 
-          app.innerHTML = `
-      <h2>Select Equipment for ${category}</h2>
-      <form id="machineSelectionForm">
-        ${machines
-              .map(name => {
-                const checked = selectedQueue.includes(name) ? 'checked' : '';
-                return `
-              <div>
-                <input type="checkbox" id="${name}" name="equipment" value="${name}" ${checked}>
-                <label for="${name}">${name}</label>
-              </div>
-            `;
-              })
-              .join('')}
-      </form>
-      <button id="saveBtn">Save Selection</button>
-      <button id="startWorkoutBtn">Start Workout</button>
-      <button id="goBackBtn">← Back to Home</button>
-    `;
+      app.innerHTML = `
+  <div class="equipment-container">
+    <h2>Select Equipment for ${category}</h2>
+    <form id="machineSelectionForm" class="equipment-list">
+      ${machines
+          .map(name => {
+            const checked = selectedQueue.includes(name) ? 'checked' : '';
+            return `
+            <label class="equipment-item">
+              <input type="checkbox" name="equipment" value="${name}" ${checked}>
+              ${name}
+            </label>
+          `;
+          })
+          .join('')}
+    </form>
+    <div class="button-row">
+      <button id="saveBtn">💾 Save Selection</button>
+      <button id="startWorkoutBtn">▶️ Start Workout</button>
+    </div>
+    <button class="back-btn" id="goBackBtn">← Back to Home</button>
+  </div>
+`;
+
 
       // TODO: need to replace localStorage with POST to backend later
       // will update the UI later
@@ -82,17 +83,20 @@ function createWorkout(category) {
 function loadCreateWorkoutView() {
   const app = document.getElementById('app');
   app.innerHTML = `
+  <div class="create-container">
     <h2>Select Your Workout Type</h2>
-    <div id="category-buttons">
-      <button data-category="Upper">Upper Body</button>
-      <button data-category="Lower">Lower Body</button>
-      <button data-category="Full">Full Body</button>
-      <button data-category="Cardio">Cardio</button>
+    <div class="category-grid">
+      <button class="category-btn" data-category="Upper">💪 Upper Body</button>
+      <button class="category-btn" data-category="Lower">🦵 Lower Body</button>
+      <button class="category-btn" data-category="Full">🏋️ Full Body</button>
+      <button class="category-btn" data-category="Cardio">🏃 Cardio</button>
     </div>
-    <button id="goBackBtn">← Back to Home</button>
-  `;
+    <button class="back-btn" id="goBackBtn">← Back to Home</button>
+  </div>
+`;
 
-  const buttons = document.querySelectorAll('#category-buttons button');
+
+  const buttons = document.querySelectorAll('.category-btn');
   buttons.forEach(btn => {
     btn.onclick = () => {
       const category = btn.getAttribute('data-category');
