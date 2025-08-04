@@ -26,12 +26,12 @@ function loadHomeView() {
     const longQueues = allMachines.filter(m => m.queue.length >= 3).length;
 
     let gymStatus = "🟢 Gym is currently chill";
-    if (busyCount >= 3 || longQueues >= 2) {
+    if (busyCount >= 3 && longQueues >= 2) {
+      gymStatus = "🔴 Peak time — expect delays";
+    } else if (busyCount >= 2 || longQueues >= 1) {
       gymStatus = "🟡 Gym is getting busy";
     }
-    if (busyCount >= 4 && longQueues >= 3) {
-      gymStatus = "🔴 Peak time — expect delays";
-    }
+
 
     const statusElement = document.createElement('p');
     statusElement.className = 'status';
